@@ -89,12 +89,12 @@ export default function App() {
   const performSearch = async (currentPrompt: string) => {
     setIsLoading(true);
     setError(null);
+    setRecommendation(null);
+
+    const systemPrompt = `Anda adalah seorang ahli gizi, chef dan vlogger makanan. Berikan satu rekomendasi makanan berdasarkan permintaan pengguna. Analisa terlebih dahulu dengan akurat tentang makanan yang diinginkan, juga cari tempat yang memang populer dimana makanan itu dijual. Format respons HARUS JSON: {"name": "Nama Makanan", "description": "Deskripsi singkat", "reason": "Alasan kenapa cocok", "ingredients": ["Bahan1", "Bahan2"], "places": ["Tempat1", "Tempat2", "Tempat3"]}`;
 
     try {
-      // 1️⃣ Start prediction via API
-
-      const systemPrompt = `Anda adalah seorang ahli gizi, chef dan vlogger makanan. Berikan satu rekomendasi makanan berdasarkan permintaan pengguna. Analisa terlebih dahulu dengan akurat tentang makanan yang diinginkan, juga cari tempat yang memang populer dimana makanan itu dijual. Format respons HARUS JSON: {"name": "Nama Makanan", "description": "Deskripsi singkat", "reason": "Alasan kenapa cocok", "ingredients": ["Bahan1", "Bahan2"], "places": ["Tempat1", "Tempat2", "Tempat3"]}`;
-
+      // Start prediction from replicate
       const response = await fetch("/api/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -112,21 +112,17 @@ export default function App() {
 
       let prediction = await response.json();
 
-      // 2️⃣ Poll until end (client-side, bukan server-side)
+      // Poll until end
       while (
         prediction.status !== "succeeded" &&
         prediction.status !== "failed"
       ) {
-        await new Promise((r) => setTimeout(r, 2000)); // tunggu 2 detik
+        await new Promise((r) => setTimeout(r, 2000));
         const statusRes = await fetch(`/api/predict/${prediction.id}`);
         prediction = await statusRes.json();
       }
 
-      // 3️⃣ Handle result
-      if (prediction.status === "failed") {
-        throw new Error("Prediction failed");
-      }
-
+      // Parse output
       const aiOutput = Array.isArray(prediction.output)
         ? prediction.output.join("")
         : prediction.output || "";
@@ -134,8 +130,16 @@ export default function App() {
       const jsonMatch = aiOutput.match(/\{[\s\S]*\}/);
       if (!jsonMatch) throw new Error("Tidak menemukan JSON di output");
 
-      const rec = JSON.parse(jsonMatch[0]);
+      const parsedResult = JSON.parse(jsonMatch[0]);
+      console.log("AI Output:");
 
+      // Parse to object JS
+      const rec = JSON.parse(parsedResult.choices[0].message.content);
+
+      // Try debug *show places
+      console.log("Tempat:", rec.places[0]);
+
+      // Safe setRecommendation to "Favoritku"
       setRecommendation({
         id: Date.now(),
         name: rec.name || "Rekomendasi Makanan",
@@ -151,76 +155,6 @@ export default function App() {
       setIsLoading(false);
     }
   };
-
-  // const performSearch = async (currentPrompt: string) => {
-  //   setIsLoading(true);
-  //   setError(null);
-  //   setRecommendation(null);
-
-  //   const systemPrompt = `Anda adalah seorang ahli gizi, chef dan vlogger makanan. Berikan satu rekomendasi makanan berdasarkan permintaan pengguna. Analisa terlebih dahulu dengan akurat tentang makanan yang diinginkan, juga cari tempat yang memang populer dimana makanan itu dijual. Format respons HARUS JSON: {"name": "Nama Makanan", "description": "Deskripsi singkat", "reason": "Alasan kenapa cocok", "ingredients": ["Bahan1", "Bahan2"], "places": ["Tempat1", "Tempat2", "Tempat3"]}`;
-
-  //   try {
-  //     // Start prediction from replicate
-  //     const response = await fetch("/api/predict", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         input: {
-  //           messages: [
-  //             { role: "system", content: systemPrompt },
-  //             { role: "user", content: `Permintaan: "${currentPrompt}"` },
-  //           ],
-  //           temperature: 0.1,
-  //           max_tokens: 500,
-  //         },
-  //       }),
-  //     });
-
-  //     let prediction = await response.json();
-
-  //     // Poll until end
-  //     while (
-  //       prediction.status !== "succeeded" &&
-  //       prediction.status !== "failed"
-  //     ) {
-  //       await new Promise((r) => setTimeout(r, 2000));
-  //       const statusRes = await fetch(`/api/predict/${prediction.id}`);
-  //       prediction = await statusRes.json();
-  //     }
-
-  //     // Parse output
-  //     const aiOutput = Array.isArray(prediction.output)
-  //       ? prediction.output.join("")
-  //       : prediction.output || "";
-
-  //     const jsonMatch = aiOutput.match(/\{[\s\S]*\}/);
-  //     if (!jsonMatch) throw new Error("Tidak menemukan JSON di output");
-
-  //     const parsedResult = JSON.parse(jsonMatch[0]);
-  //     console.log("AI Output:");
-
-  //     // Parse to object JS
-  //     const rec = JSON.parse(parsedResult.choices[0].message.content);
-
-  //     // Try debug *show places
-  //     console.log("Tempat:", rec.places[0]);
-
-  //     // Safe setRecommendation to "Favoritku"
-  //     setRecommendation({
-  //       id: Date.now(),
-  //       name: rec.name || "Rekomendasi Makanan",
-  //       description: rec.description || "",
-  //       reason: rec.reason || "",
-  //       ingredients: rec.ingredients || [],
-  //       places: rec.places || [],
-  //     });
-  //   } catch (err) {
-  //     console.error("API Error:", err);
-  //     setError("Gagal mengambil rekomendasi");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();

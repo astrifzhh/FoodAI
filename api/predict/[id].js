@@ -7,15 +7,27 @@ export default async function handler(req, res) {
       {
         headers: {
           Authorization: `Token ${process.env.REPLICATE_API_TOKEN}`,
-          "Content-Type": "application/json",
         },
       }
     );
 
     const data = await response.json();
-    res.status(200).json(data);
+
+    let recommendation = null;
+    if (data.status === "succeeded" && data.output && data.output.length > 0) {
+      try {
+        const outputObj = JSON.parse(data.output[0]);
+        if (outputObj?.message?.content) {
+          recommendation = JSON.parse(outputObj.message.content);
+        }
+      } catch (err) {
+        console.error("Gagal parse recommendation:", err);
+      }
+    }
+
+    res.status(200).json({ ...data, recommendation });
   } catch (err) {
-    console.error("Status error:", err);
-    res.status(500).json({ error: "Failed to fetch prediction status" });
+    console.error("Error polling Replicate:", err);
+    res.status(500).json({ error: "Server error", details: err.message });
   }
 }
