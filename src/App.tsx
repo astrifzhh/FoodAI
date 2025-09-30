@@ -38,13 +38,23 @@ export default function App() {
     };
   }
 
+  interface Review {
+    place: number;
+    taste: number;
+    price: number;
+  }
+
+  interface SavedItem extends Omit<Recommendation, "review"> {
+    review: Review; // required for saved items
+  }
+
   const [prompt, setPrompt] = useState("");
   const [recommendation, setRecommendation] = useState<Recommendation | null>(
     null
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [savedItems, setSavedItems] = useState<Recommendation[]>([]);
+  const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
   const [view, setView] = useState("home"); // 'home' or 'saved'
   const [notification, setNotification] = useState("");
 
@@ -353,7 +363,7 @@ export default function App() {
             </h2>
             {savedItems.length > 0 ? (
               <div>
-                {savedItems.map((item: Recommendation) => (
+                {savedItems.map((item) => (
                   <SavedItemCard
                     key={item.id}
                     item={item}

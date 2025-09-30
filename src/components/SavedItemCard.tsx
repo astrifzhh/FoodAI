@@ -9,6 +9,10 @@ interface Review {
   price: number;
 }
 
+interface SavedItem extends Omit<Recommendation, "review"> {
+  review: Review; // required for saved items
+}
+
 interface Recommendation {
   id: number;
   name: string;
