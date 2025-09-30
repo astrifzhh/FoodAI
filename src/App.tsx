@@ -122,10 +122,6 @@ export default function App() {
         prediction = await statusRes.json();
       }
 
-      if (prediction.status === "failed") {
-        throw new Error("Prediction failed");
-      }
-
       // Parse output
       const aiOutput = Array.isArray(prediction.output)
         ? prediction.output.join("")
