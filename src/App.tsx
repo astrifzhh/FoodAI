@@ -254,10 +254,10 @@ export default function App() {
                 </label>
                 <textarea
                   id="food-prompt"
-                  rows="3"
+                  // rows="3"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FE875F] focus:border-transparent transition"
+                  className="w-full h-32 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FE875F] focus:border-transparent transition"
                   placeholder="Contoh: sehat untuk diet, pedas dan berkuah, atau sarapan tinggi protein."
                 />
                 <button
