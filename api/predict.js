@@ -78,5 +78,4 @@ export default async function handler(req, res) {
   );
 
   console.log("Using Replicate API key:", process.env.REPLICATE_API_TOKEN);
-  console.log("Sending prompt:", prompt);
 }
