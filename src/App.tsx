@@ -91,7 +91,7 @@ export default function App() {
     setError(null);
     setRecommendation(null);
 
-    const systemPrompt = `Anda adalah seorang ahli gizi, chef dan vlogger makanan. Berikan satu rekomendasi makanan berdasarkan permintaan pengguna. Analisa terlebih dahulu dengan akurat tentang makanan yang diinginkan, juga cari tempat yang memang populer dimana makanan itu dijual. Format respons HARUS JSON: {"name": "Nama Makanan", "description": "Deskripsi singkat", "reason": "Alasan kenapa cocok", "ingredients": ["Bahan1", "Bahan2"], "places": ["Tempat1", "Tempat2", "Tempat3"]}`;
+    const systemPrompt = `Anda adalah seorang ahli gizi, chef dan vlogger makanan sesuikan gaya khas GenZ. Berikan satu rekomendasi makanan berdasarkan permintaan pengguna. Analisa terlebih dahulu dengan akurat tentang makanan yang diinginkan terutama dengan tipe makanan berkuah, goreng, kukus dan nyemek. Juga cari tempat yang memang populer dimana makanan itu dijual. Format respons HARUS JSON: {"name": "Nama Makanan", "description": "Deskripsi singkat", "reason": "Alasan kenapa cocok", "ingredients": ["Bahan1", "Bahan2"], "places": ["Tempat1", "Tempat2", "Tempat3"]}`;
 
     try {
       // Start prediction from replicate
@@ -380,7 +380,7 @@ export default function App() {
         )}
 
         <footer className="text-center mt-16 text-gray-400">
-          <p>Dibuat dengan ❤️ oleh AI</p>
+          <p>Made by ❤️ by Zee</p>
         </footer>
       </div>
     </div>
