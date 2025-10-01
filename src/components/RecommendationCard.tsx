@@ -61,9 +61,9 @@ const RecommendationCard = ({
             <li key={index}>{item}</li>
           ))}
         </ul>
-        <p className="text-xs text-gray-400 mt-2">
+        {/* <p className="text-xs text-gray-400 mt-2">
           Fitur ini akan menggunakan lokasimu untuk mencari restoran sungguhan.
-        </p>
+        </p> */}
       </div>
     </div>
     <div className="p-4 bg-gray-50">
